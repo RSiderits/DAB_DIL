@@ -1,4 +1,4 @@
-HELP.TXT
+HELP
 DAB 4-IMAGE DILUTION SERIES LINEARITY COMPARATOR
 =================================================
 
