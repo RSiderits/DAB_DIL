@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DAB Dilution Series Comparator</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --panel: #ffffff;
+    --border: #b8c2cc;
+    --text: #1f2933;
+    --muted: #52606d;
+    --accent: #1f6feb;
+    --accent2: #e6f0ff;
+    --warn: #fff4d6;
+    --warnborder: #d6a100;
+    --green: #dff3e3;
+    --greenBorder: #2e7d32;
+    --yellow: #fff4d6;
+    --yellowBorder: #b7791f;
+    --red: #fde2e1;
+    --redBorder: #c53030;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 18px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  h1 { margin: 0 0 8px 0; font-size: 23px; }
+  h2 { margin: 0 0 10px 0; font-size: 17px; }
+  h3 { margin: 14px 0 8px 0; font-size: 15px; }
+  p { margin: 6px 0; line-height: 1.35; }
+
+  .top-note {
+    max-width: 1540px;
+    margin-bottom: 12px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .app-grid {
+    display: grid;
+    grid-template-columns: minmax(850px, 1fr) minmax(520px, 620px);
+    gap: 14px;
+    max-width: 1640px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .drop-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .drop-zone {
+    min-height: 128px;
+    border: 2px dashed #8aa4bf;
+    border-radius: 10px;
+    background: #f8fbff;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+  }
+
+  .drop-zone.dragover {
+    border-color: var(--accent);
+    background: var(--accent2);
+  }
+
+  .drop-title { font-weight: bold; font-size: 14px; }
+  .drop-subtitle { font-size: 11.5px; color: var(--muted); word-break: break-word; }
+  .file-input { margin: 0 auto; max-width: 100%; font-size: 11px; }
+
+  .parameter-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    align-items: end;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #fbfcfd;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 7px;
+    border: 1px solid #b8c2cc;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .roi-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    background: #fbfcfd;
+  }
+
+  button {
+    border: 1px solid #8ba4bd;
+    background: #ffffff;
+    border-radius: 7px;
+    padding: 8px 11px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-weight: bold;
+  }
+
+  button:hover { filter: brightness(0.96); }
+  button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+  .canvas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  .image-card {
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fbfcfd;
+  }
+
+  .image-card canvas {
+    width: 100%;
+    max-height: 330px;
+    object-fit: contain;
+    border: 1px solid #d6dbe1;
+    background: #fff;
+    cursor: crosshair;
+  }
+
+  .preview-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  .status {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccd6e0;
+    background: #f7fafc;
+    font-size: 13px;
+  }
+
+  .summary-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 930px;
+    font-size: 12px;
+  }
+
+  th, td {
+    border-bottom: 1px solid #d8dee4;
+    border-right: 1px solid #e4e8ed;
+    padding: 7px 8px;
+    text-align: right;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+
+  th:first-child, td:first-child { text-align: left; }
+  th:last-child, td:last-child { border-right: none; }
+  tr:last-child td { border-bottom: none; }
+  th { background: #edf2f7; font-weight: bold; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .metric {
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    padding: 9px;
+    background: #fbfcfd;
+  }
+
+  .metric .name { font-size: 12px; color: var(--muted); }
+  .metric .value { font-size: 18px; font-weight: bold; margin-top: 3px; }
+
+  .recommendation {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #d0d7de;
+    background: #fbfcfd;
+  }
+
+  .rec-accept { background: var(--green); border-color: var(--greenBorder); }
+  .rec-review { background: var(--yellow); border-color: var(--yellowBorder); }
+  .rec-investigate { background: var(--red); border-color: var(--redBorder); }
+
+  .cell-green { background: var(--green); }
+  .cell-yellow { background: var(--yellow); }
+  .cell-red { background: var(--red); }
+
+  .bar-wrap {
+    width: 100%;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fbfcfd;
+    margin-top: 8px;
+  }
+
+  #barChart {
+    width: 100%;
+    height: 260px;
+    border: 1px solid #d6dbe1;
+    background: #fff;
+  }
+
+  .small-text { font-size: 12px; color: var(--muted); }
+  #hiddenReport { display: none; }
+
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 7px;
+    font-size: 11.5px;
+  }
+
+  .legend span {
+    border: 1px solid #d0d7de;
+    border-radius: 5px;
+    padding: 4px 5px;
+    background: #fff;
+    text-align: center;
+  }
+
+  @media (max-width: 1280px) {
+    .app-grid { grid-template-columns: 1fr; }
+    .drop-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 860px) {
+    .drop-grid, .canvas-grid, .metric-grid { grid-template-columns: 1fr; }
+    .parameter-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <h1>DAB 4-Image Dilution Series Comparator</h1>
+  <div class="top-note">
+    Compare four serial ROI-matched DAB images from a dilution series. Draw the ROI on Image 1; the same relative ROI is applied to Images 2–4. Manual bucket thresholds are used for weak, moderate, and strong staining. Negative/background is excluded from the visible bucket comparison.
+  </div>
+
+  <div class="app-grid">
+    <section class="panel">
+      <h2>Image Input</h2>
+      <div class="drop-grid">
+        <div class="drop-zone" id="drop1"><div class="drop-title">Image 1 / Reference</div><div class="drop-subtitle">Drag/drop or choose file</div><input class="file-input" type="file" id="file1" accept="image/*" /><div class="drop-subtitle" id="name1">No image loaded</div></div>
+        <div class="drop-zone" id="drop2"><div class="drop-title">Image 2</div><div class="drop-subtitle">Drag/drop or choose file</div><input class="file-input" type="file" id="file2" accept="image/*" /><div class="drop-subtitle" id="name2">No image loaded</div></div>
+        <div class="drop-zone" id="drop3"><div class="drop-title">Image 3</div><div class="drop-subtitle">Drag/drop or choose file</div><input class="file-input" type="file" id="file3" accept="image/*" /><div class="drop-subtitle" id="name3">No image loaded</div></div>
+        <div class="drop-zone" id="drop4"><div class="drop-title">Image 4</div><div class="drop-subtitle">Drag/drop or choose file</div><input class="file-input" type="file" id="file4" accept="image/*" /><div class="drop-subtitle" id="name4">No image loaded</div></div>
+      </div>
+
+      <h3>Manual Thresholds and Control Limits</h3>
+      <div class="parameter-grid">
+        <div class="field"><label>Negative/Weak OD cutoff</label><input id="thrNegWeak" type="number" step="0.001" value="0.120" /></div>
+        <div class="field"><label>Weak/Moderate OD cutoff</label><input id="thrWeakMod" type="number" step="0.001" value="0.260" /></div>
+        <div class="field"><label>Moderate/Strong OD cutoff</label><input id="thrModStrong" type="number" step="0.001" value="0.450" /></div>
+        <div class="field"><label>Green limit, % diff &lt;</label><input id="greenLimit" type="number" step="0.1" value="15" /></div>
+        <div class="field"><label>Yellow upper limit, % diff ≤</label><input id="yellowLimit" type="number" step="0.1" value="25" /></div>
+        <div class="field"><label>Minimum ROI pixels</label><input id="minPixels" type="number" step="100" value="500" /></div>
+      </div>
+
+      <div class="roi-toolbar">
+        <button id="roiModeBtn">ROI Drawing: ON</button>
+        <button id="clearRoiBtn">Clear ROI</button>
+        <button class="primary" id="analyzeBtn">Calculate</button>
+        <button id="copyBtn" disabled>Copy Report</button>
+        <button id="exportBtn" disabled>Export Report</button>
+        <button id="resetBtn">Reset</button>
+        <span class="small-text">Draw a rectangle on Image 1. If no ROI is drawn, whole-image analysis is used, which is allowed but less defensible.</span>
+      </div>
+
+      <div class="canvas-grid">
+        <div class="image-card"><div class="preview-label">Image 1 Preview / Draw ROI Here</div><canvas id="canvas1"></canvas></div>
+        <div class="image-card"><div class="preview-label">Image 2 Preview / Matched ROI</div><canvas id="canvas2"></canvas></div>
+        <div class="image-card"><div class="preview-label">Image 3 Preview / Matched ROI</div><canvas id="canvas3"></canvas></div>
+        <div class="image-card"><div class="preview-label">Image 4 Preview / Matched ROI</div><canvas id="canvas4"></canvas></div>
+      </div>
+
+      <div class="status" id="statusBox">Load four images, draw an ROI on Image 1, then press Calculate.</div>
+    </section>
+
+    <section class="panel result-panel">
+      <h2>RESULT</h2>
+      <div class="metric-grid">
+        <div class="metric"><div class="name">Reference Mean DAB OD</div><div class="value" id="refMean">--</div></div>
+        <div class="metric"><div class="name">Largest Overall % Difference</div><div class="value" id="largestOverall">--</div></div>
+        <div class="metric"><div class="name">Greatest Bucket Difference</div><div class="value" id="greatestBucketShort">--</div></div>
+        <div class="metric"><div class="name">ROI Mode</div><div class="value" id="roiModeText">--</div></div>
+      </div>
+
+      <div class="recommendation" id="recommendationBox">Lot acceptance recommendation: --</div>
+
+      <h3>Average DAB Intensity Bar Chart</h3>
+      <div class="bar-wrap"><canvas id="barChart"></canvas></div>
+
+      <h3>Structured Summary: Overall DAB OD</h3>
+      <div class="summary-table-wrap">
+        <table id="overallTable">
+          <thead><tr><th>Image</th><th>Mean DAB OD</th><th>% Diff vs Image 1</th><th>Direction vs Image 1</th><th>Control Zone</th><th>ROI Tissue Pixels</th></tr></thead>
+          <tbody id="overallBody"></tbody>
+        </table>
+      </div>
+
+      <h3>Structured Summary: Weak / Moderate / Strong Buckets</h3>
+      <div class="summary-table-wrap">
+        <table id="bucketTable">
+          <thead><tr><th>Image</th><th>Bucket</th><th>Mean OD</th><th>% Diff vs Image 1 Bucket</th><th>Area %</th><th>Area Delta vs Image 1</th><th>Direction</th><th>Control Zone</th></tr></thead>
+          <tbody id="bucketBody"></tbody>
+        </table>
+      </div>
+
+      <div class="legend">
+        <span>Green: &lt; green limit</span>
+        <span>Yellow: green to yellow limit</span>
+        <span>Red: &gt; yellow limit</span>
+      </div>
+    </section>
+  </div>
+
+  <textarea id="hiddenReport"></textarea>
+
+<script>
+(function () {
+  const state = {
+    images: [null, null, null, null],
+    names: ["Image 1", "Image 2", "Image 3", "Image 4"],
+    roi: null,
+    drawing: false,
+    drawStart: null,
+    roiMode: true,
+    lastReport: "",
+    results: null
+  };
+
+  const ids = id => document.getElementById(id);
+  const canvases = [ids("canvas1"), ids("canvas2"), ids("canvas3"), ids("canvas4")];
+  const fileInputs = [ids("file1"), ids("file2"), ids("file3"), ids("file4")];
+
+  fileInputs.forEach((input, idx) => input.addEventListener("change", e => loadFile(e.target.files[0], idx)));
+  for (let i = 0; i < 4; i++) setupDrop(ids("drop" + (i + 1)), i);
+
+  ids("roiModeBtn").addEventListener("click", toggleRoiMode);
+  ids("clearRoiBtn").addEventListener("click", clearRoi);
+  ids("analyzeBtn").addEventListener("click", analyze);
+  ids("copyBtn").addEventListener("click", copyReport);
+  ids("exportBtn").addEventListener("click", exportReport);
+  ids("resetBtn").addEventListener("click", resetAll);
+
+  canvases[0].addEventListener("mousedown", startRoi);
+  canvases[0].addEventListener("mousemove", moveRoi);
+  canvases[0].addEventListener("mouseup", endRoi);
+  canvases[0].addEventListener("mouseleave", endRoi);
+
+  function setupDrop(zone, idx) {
+    ["dragenter", "dragover"].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); zone.classList.add("dragover"); }));
+    ["dragleave", "drop"].forEach(evt => zone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); zone.classList.remove("dragover"); }));
+    zone.addEventListener("drop", e => {
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      loadFile(file, idx);
+    });
+  }
+
+  function loadFile(file, idx) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setStatus("Please load an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const img = new Image();
+      img.onload = function () {
+        state.images[idx] = img;
+        state.names[idx] = file.name || ("Image " + (idx + 1));
+        ids("name" + (idx + 1)).textContent = state.names[idx];
+        drawImageCanvas(idx);
+        drawAllRoiBoxes();
+        setStatus("Image loaded. Load all four images, draw ROI on Image 1, then press Calculate.");
+      };
+      img.onerror = () => setStatus("Could not read that image file.");
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function drawImageCanvas(idx) {
+    const img = state.images[idx];
+    const canvas = canvases[idx];
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!img) {
+      canvas.width = 1; canvas.height = 1; ctx.clearRect(0,0,1,1); return;
+    }
+    const maxW = 720;
+    const maxH = 420;
+    const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  }
+
+  function getMouse(canvas, evt) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (evt.clientX - rect.left) * (canvas.width / rect.width),
+      y: (evt.clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  function startRoi(evt) {
+    if (!state.roiMode || !state.images[0]) return;
+    state.drawing = true;
+    state.drawStart = getMouse(canvases[0], evt);
+    state.roi = { x: state.drawStart.x, y: state.drawStart.y, w: 0, h: 0 };
+  }
+
+  function moveRoi(evt) {
+    if (!state.drawing || !state.roiMode) return;
+    const p = getMouse(canvases[0], evt);
+    state.roi = normalizeRect(state.drawStart.x, state.drawStart.y, p.x - state.drawStart.x, p.y - state.drawStart.y);
+    drawAllRoiBoxes();
+  }
+
+  function endRoi() {
+    if (!state.drawing) return;
+    state.drawing = false;
+    if (state.roi && (state.roi.w < 8 || state.roi.h < 8)) {
+      state.roi = null;
+      setStatus("ROI was too small and was cleared. Draw a larger rectangle on Image 1.");
+    } else if (state.roi) {
+      setStatus("ROI selected on Image 1. The matched relative ROI will be applied to Images 2–4.");
+    }
+    drawAllRoiBoxes();
+  }
+
+  function normalizeRect(x, y, w, h) {
+    const nx = w < 0 ? x + w : x;
+    const ny = h < 0 ? y + h : y;
+    return { x: Math.max(0, nx), y: Math.max(0, ny), w: Math.abs(w), h: Math.abs(h) };
+  }
+
+  function drawAllRoiBoxes() {
+    for (let i = 0; i < 4; i++) drawImageCanvas(i);
+    if (!state.roi) return;
+    for (let i = 0; i < 4; i++) {
+      if (!state.images[i]) continue;
+      const r = roiForCanvas(i);
+      const ctx = canvases[i].getContext("2d");
+      ctx.save();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#1f6feb";
+      ctx.setLineDash([8, 5]);
+      ctx.strokeRect(r.x, r.y, r.w, r.h);
+      ctx.fillStyle = "rgba(31, 111, 235, 0.10)";
+      ctx.fillRect(r.x, r.y, r.w, r.h);
+      ctx.restore();
+    }
+  }
+
+  function roiForCanvas(idx) {
+    if (!state.roi) return null;
+    const c1 = canvases[0];
+    const ci = canvases[idx];
+    const rx = state.roi.x / c1.width;
+    const ry = state.roi.y / c1.height;
+    const rw = state.roi.w / c1.width;
+    const rh = state.roi.h / c1.height;
+    return { x: rx * ci.width, y: ry * ci.height, w: rw * ci.width, h: rh * ci.height };
+  }
+
+  function toggleRoiMode() {
+    state.roiMode = !state.roiMode;
+    ids("roiModeBtn").textContent = state.roiMode ? "ROI Drawing: ON" : "ROI Drawing: OFF";
+    setStatus(state.roiMode ? "ROI drawing is on. Draw on Image 1." : "ROI drawing is off. Existing ROI remains unless cleared.");
+  }
+
+  function clearRoi() {
+    state.roi = null;
+    drawAllRoiBoxes();
+    setStatus("ROI cleared. Analysis will use whole image unless a new ROI is drawn.");
+  }
+
+  function readParams() {
+    const p = {
+      negWeak: parseFloat(ids("thrNegWeak").value),
+      weakMod: parseFloat(ids("thrWeakMod").value),
+      modStrong: parseFloat(ids("thrModStrong").value),
+      greenLimit: parseFloat(ids("greenLimit").value),
+      yellowLimit: parseFloat(ids("yellowLimit").value),
+      minPixels: parseInt(ids("minPixels").value, 10)
+    };
+    if ([p.negWeak, p.weakMod, p.modStrong, p.greenLimit, p.yellowLimit].some(x => !isFinite(x))) throw new Error("Thresholds and limits must be numeric.");
+    if (!(p.negWeak < p.weakMod && p.weakMod < p.modStrong)) throw new Error("Thresholds must increase: negative/weak < weak/moderate < moderate/strong.");
+    if (!(p.greenLimit > 0 && p.yellowLimit > p.greenLimit)) throw new Error("Control limits must be valid: green > 0 and yellow > green.");
+    if (!isFinite(p.minPixels) || p.minPixels < 1) p.minPixels = 500;
+    return p;
+  }
+
+  function analyze() {
+    try {
+      if (state.images.some(img => !img)) {
+        setStatus("Load all four images before calculating. Half a dilution series is not a dilution series.");
+        return;
+      }
+      const p = readParams();
+      const analyses = [];
+      for (let i = 0; i < 4; i++) {
+        const values = getDabPixels(i, p);
+        if (values.length < p.minPixels) {
+          setStatus("Image " + (i + 1) + " has too few analyzable tissue pixels in the selected ROI: " + values.length + ". Adjust ROI or minimum pixel setting.");
+          return;
+        }
+        analyses.push(summarizeImage(values, p));
+      }
+
+      const results = buildComparisons(analyses, p);
+      state.results = results;
+      updateResults(results, p);
+      drawBarChart(results.images);
+      drawAllRoiBoxes();
+      drawOverlays(p);
+      state.lastReport = buildReport(results, p);
+      ids("hiddenReport").value = state.lastReport;
+      ids("copyBtn").disabled = false;
+      ids("exportBtn").disabled = false;
+      setStatus("Analysis complete. Review the ROI, overlays, structured tables, and bar chart. Recommendation: " + results.recommendation + ".");
+    } catch (err) {
+      setStatus(err.message || String(err));
+    }
+  }
+
+  function getDabPixels(idx, p) {
+    const img = state.images[idx];
+    const canvas = document.createElement("canvas");
+    const maxDim = 1400;
+    const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    let roi = null;
+    if (state.roi) {
+      const c1 = canvases[0];
+      const rx = state.roi.x / c1.width;
+      const ry = state.roi.y / c1.height;
+      const rw = state.roi.w / c1.width;
+      const rh = state.roi.h / c1.height;
+      roi = {
+        x: Math.round(rx * canvas.width),
+        y: Math.round(ry * canvas.height),
+        w: Math.round(rw * canvas.width),
+        h: Math.round(rh * canvas.height)
+      };
+    } else {
+      roi = { x: 0, y: 0, w: canvas.width, h: canvas.height };
+    }
+
+    roi.x = clamp(roi.x, 0, canvas.width - 1);
+    roi.y = clamp(roi.y, 0, canvas.height - 1);
+    roi.w = clamp(roi.w, 1, canvas.width - roi.x);
+    roi.h = clamp(roi.h, 1, canvas.height - roi.y);
+
+    const data = ctx.getImageData(roi.x, roi.y, roi.w, roi.h).data;
+    const values = [];
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+      if (a < 20) continue;
+      const brightness = (r + g + b) / 3;
+      const saturation = max3(r, g, b) - min3(r, g, b);
+      if (brightness > 238 && saturation < 18) continue;
+      if (brightness < 18) continue;
+      const od = dabOD(r, g, b);
+      if (od > 0.015 || brightness < 225) values.push(od);
+    }
+    return values;
+  }
+
+  function summarizeImage(values, p) {
+    const buckets = { weak: [], moderate: [], strong: [] };
+    for (const v of values) {
+      if (v < p.negWeak) continue;
+      if (v < p.weakMod) buckets.weak.push(v);
+      else if (v < p.modStrong) buckets.moderate.push(v);
+      else buckets.strong.push(v);
+    }
+    const total = values.length;
+    return {
+      mean: mean(values),
+      pixels: total,
+      weak: bucketStats(buckets.weak, total),
+      moderate: bucketStats(buckets.moderate, total),
+      strong: bucketStats(buckets.strong, total)
+    };
+  }
+
+  function buildComparisons(analyses, p) {
+    const ref = analyses[0];
+    const images = analyses.map((a, idx) => {
+      const overallDiff = idx === 0 ? 0 : percentDifference(ref.mean, a.mean);
+      return {
+        index: idx + 1,
+        name: state.names[idx],
+        mean: a.mean,
+        pixels: a.pixels,
+        overallDiff,
+        overallDirection: idx === 0 ? "reference" : direction(ref.mean, a.mean),
+        overallZone: zone(overallDiff, p),
+        weak: compareBucket(ref.weak, a.weak, idx, p),
+        moderate: compareBucket(ref.moderate, a.moderate, idx, p),
+        strong: compareBucket(ref.strong, a.strong, idx, p)
+      };
+    });
+
+    let maxDiff = 0;
+    let maxBucket = { label: "--", diff: 0, image: "--" };
+    for (const img of images.slice(1)) {
+      maxDiff = Math.max(maxDiff, img.overallDiff || 0);
+      for (const b of ["weak", "moderate", "strong"]) {
+        const d = img[b].diff;
+        if (d !== null && isFinite(d) && d > maxBucket.diff) {
+          maxBucket = { label: capitalize(b), diff: d, image: "Image " + img.index, direction: img[b].direction };
+        }
+        if (d !== null && isFinite(d)) maxDiff = Math.max(maxDiff, d);
+      }
+    }
+
+    const recommendation = recommendationFromMax(maxDiff, p);
+    return { images, maxDiff, maxBucket, recommendation, roiUsed: !!state.roi };
+  }
+
+  function compareBucket(refBucket, imgBucket, idx, p) {
+    const diff = idx === 0 ? 0 : percentDifferenceNullable(refBucket.mean, imgBucket.mean);
+    const areaDelta = imgBucket.areaPct - refBucket.areaPct;
+    return {
+      mean: imgBucket.mean,
+      areaPct: imgBucket.areaPct,
+      diff,
+      areaDelta,
+      direction: idx === 0 ? "reference" : directionNullable(refBucket.mean, imgBucket.mean),
+      zone: zone(diff || 0, p)
+    };
+  }
+
+  function updateResults(results, p) {
+    ids("refMean").textContent = fmt(results.images[0].mean);
+    ids("largestOverall").textContent = fmtPct(Math.max(...results.images.map(x => x.overallDiff || 0)));
+    ids("greatestBucketShort").textContent = results.maxBucket.label + " / " + results.maxBucket.image + " / " + fmtPct(results.maxBucket.diff);
+    ids("roiModeText").textContent = results.roiUsed ? "ROI" : "Whole image";
+
+    const recBox = ids("recommendationBox");
+    recBox.className = "recommendation";
+    if (results.recommendation === "Accept") recBox.classList.add("rec-accept");
+    else if (results.recommendation === "Review") recBox.classList.add("rec-review");
+    else recBox.classList.add("rec-investigate");
+    recBox.textContent = "Lot acceptance recommendation: " + results.recommendation + " — maximum relevant difference is " + fmtPct(results.maxDiff) + ".";
+
+    const overallBody = ids("overallBody");
+    overallBody.innerHTML = "";
+    for (const img of results.images) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = "<td>Image " + img.index + "</td>" +
+        "<td>" + fmt(img.mean) + "</td>" +
+        "<td class='" + zoneClass(img.overallZone) + "'>" + fmtPct(img.overallDiff) + "</td>" +
+        "<td>" + img.overallDirection + "</td>" +
+        "<td class='" + zoneClass(img.overallZone) + "'>" + img.overallZone + "</td>" +
+        "<td>" + img.pixels + "</td>";
+      overallBody.appendChild(tr);
+    }
+
+    const bucketBody = ids("bucketBody");
+    bucketBody.innerHTML = "";
+    for (const img of results.images) {
+      for (const b of ["weak", "moderate", "strong"]) {
+        const row = img[b];
+        const tr = document.createElement("tr");
+        tr.innerHTML = "<td>Image " + img.index + "</td>" +
+          "<td>" + capitalize(b) + "</td>" +
+          "<td>" + fmtNullable(row.mean) + "</td>" +
+          "<td class='" + zoneClass(row.zone) + "'>" + fmtPctNullable(row.diff) + "</td>" +
+          "<td>" + fmtPct(row.areaPct) + "</td>" +
+          "<td>" + signedPct(row.areaDelta) + "</td>" +
+          "<td>" + row.direction + "</td>" +
+          "<td class='" + zoneClass(row.zone) + "'>" + row.zone + "</td>";
+        bucketBody.appendChild(tr);
+      }
+    }
+  }
+
+  function drawBarChart(images) {
+    const canvas = ids("barChart");
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(520, Math.round(rect.width * window.devicePixelRatio));
+    canvas.height = Math.round(260 * window.devicePixelRatio);
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+
+    const padL = 50, padR = 18, padT = 24, padB = 45;
+    const maxVal = Math.max(...images.map(x => x.mean || 0), 0.01) * 1.15;
+    const chartW = w - padL - padR;
+    const chartH = h - padT - padB;
+
+    ctx.strokeStyle = "#9aa5b1";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT);
+    ctx.lineTo(padL, padT + chartH);
+    ctx.lineTo(padL + chartW, padT + chartH);
+    ctx.stroke();
+
+    ctx.fillStyle = "#52606d";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+    for (let i = 0; i <= 4; i++) {
+      const val = (maxVal / 4) * i;
+      const y = padT + chartH - (val / maxVal) * chartH;
+      ctx.strokeStyle = "#e4e8ed";
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + chartW, y);
+      ctx.stroke();
+      ctx.fillText(val.toFixed(2), padL - 6, y + 4);
+    }
+
+    const gap = 20;
+    const barW = (chartW - gap * (images.length + 1)) / images.length;
+    images.forEach((img, i) => {
+      const x = padL + gap + i * (barW + gap);
+      const bh = (img.mean / maxVal) * chartH;
+      const y = padT + chartH - bh;
+      ctx.fillStyle = "#6b7c93";
+      ctx.fillRect(x, y, barW, bh);
+      ctx.fillStyle = "#1f2933";
+      ctx.textAlign = "center";
+      ctx.font = "12px Arial";
+      ctx.fillText("Image " + img.index, x + barW / 2, padT + chartH + 18);
+      ctx.fillText(fmt(img.mean), x + barW / 2, y - 6);
+    });
+
+    ctx.save();
+    ctx.translate(14, padT + chartH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillStyle = "#52606d";
+    ctx.textAlign = "center";
+    ctx.font = "12px Arial";
+    ctx.fillText("Mean DAB OD", 0, 0);
+    ctx.restore();
+  }
+
+  function drawOverlays(p) {
+    for (let idx = 0; idx < 4; idx++) {
+      const img = state.images[idx];
+      const canvas = canvases[idx];
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!img) continue;
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = imageData.data;
+      const r = state.roi ? roiForCanvas(idx) : { x: 0, y: 0, w: canvas.width, h: canvas.height };
+      const x0 = Math.max(0, Math.floor(r.x));
+      const y0 = Math.max(0, Math.floor(r.y));
+      const x1 = Math.min(canvas.width, Math.ceil(r.x + r.w));
+      const y1 = Math.min(canvas.height, Math.ceil(r.y + r.h));
+
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const i = (y * canvas.width + x) * 4;
+          const rr = d[i], gg = d[i + 1], bb = d[i + 2];
+          const brightness = (rr + gg + bb) / 3;
+          const saturation = max3(rr, gg, bb) - min3(rr, gg, bb);
+          if (brightness > 238 && saturation < 18) continue;
+          if (brightness < 18) continue;
+          const od = dabOD(rr, gg, bb);
+          if (od < p.negWeak) continue;
+          else if (od < p.weakMod) blend(d, i, 90, 170, 255, 0.35);
+          else if (od < p.modStrong) blend(d, i, 255, 165, 0, 0.40);
+          else blend(d, i, 220, 40, 40, 0.43);
+        }
+      }
+      ctx.putImageData(imageData, 0, 0);
+      drawAllRoiBoxes();
+    }
+  }
+
+  function buildReport(results, p) {
+    const lines = [];
+    lines.push("DAB 4-IMAGE DILUTION SERIES COMPARISON REPORT");
+    lines.push("================================================");
+    lines.push("Generated: " + new Date().toLocaleString());
+    lines.push("ROI mode: " + (results.roiUsed ? "ROI drawn on Image 1 and applied proportionally to Images 2-4" : "Whole image analysis"));
+    lines.push("Recommendation: " + results.recommendation);
+    lines.push("Maximum relevant difference: " + fmtPct(results.maxDiff));
+    lines.push("");
+    lines.push("IMAGES");
+    lines.push("----------------------------------------");
+    results.images.forEach(img => lines.push("Image " + img.index + ": " + img.name));
+    lines.push("");
+    lines.push("MANUAL THRESHOLDS");
+    lines.push("----------------------------------------");
+    lines.push("Negative/Weak OD cutoff: " + fmt(p.negWeak));
+    lines.push("Weak/Moderate OD cutoff: " + fmt(p.weakMod));
+    lines.push("Moderate/Strong OD cutoff: " + fmt(p.modStrong));
+    lines.push("Green limit: < " + fmtPct(p.greenLimit));
+    lines.push("Yellow zone: " + fmtPct(p.greenLimit) + " to " + fmtPct(p.yellowLimit));
+    lines.push("Red zone: > " + fmtPct(p.yellowLimit));
+    lines.push("");
+    lines.push("OVERALL DAB OD SUMMARY");
+    lines.push("----------------------------------------");
+    results.images.forEach(img => {
+      lines.push("Image " + img.index + ": Mean OD " + fmt(img.mean) + "; % diff vs Image 1 " + fmtPct(img.overallDiff) + "; direction " + img.overallDirection + "; zone " + img.overallZone + "; tissue pixels " + img.pixels + ".");
+    });
+    lines.push("");
+    lines.push("WEAK / MODERATE / STRONG BUCKET SUMMARY");
+    lines.push("----------------------------------------");
+    results.images.forEach(img => {
+      ["weak", "moderate", "strong"].forEach(b => {
+        const row = img[b];
+        lines.push("Image " + img.index + " " + capitalize(b) + ": Mean OD " + fmtNullable(row.mean) + "; % diff vs Image 1 bucket " + fmtPctNullable(row.diff) + "; area " + fmtPct(row.areaPct) + "; area delta " + signedPct(row.areaDelta) + "; direction " + row.direction + "; zone " + row.zone + ".");
+      });
+    });
+    lines.push("");
+    lines.push("GREATEST BUCKET DIFFERENCE");
+    lines.push("----------------------------------------");
+    lines.push(results.maxBucket.label + " in " + results.maxBucket.image + ": " + fmtPct(results.maxBucket.diff) + "; direction " + (results.maxBucket.direction || "not available") + ".");
+    lines.push("");
+    lines.push("FORMULAS");
+    lines.push("----------------------------------------");
+    lines.push("Overall percent difference = (|Image N Mean DAB OD - Image 1 Mean DAB OD| / average of the two Mean DAB OD values) x 100");
+    lines.push("Bucket intensity percent difference uses the same formula, but compares the mean DAB OD within that bucket only.");
+    lines.push("Area delta = Image N bucket tissue fraction - Image 1 bucket tissue fraction.");
+    lines.push("Direction is reported separately as lighter / weaker or darker / stronger.");
+    lines.push("");
+    lines.push("IMPORTANT NOTE");
+    lines.push("----------------------------------------");
+    lines.push("This dilution-series comparison uses user-defined negative/weak/moderate/strong DAB OD thresholds. The same thresholds are applied to all four images so that the dilution series is assessed on a common scale. Review ROI placement and QC overlays before trusting the numbers.");
+    lines.push("");
+    lines.push("CAUTION");
+    lines.push("----------------------------------------");
+    lines.push("This is a practical browser implementation for relative research comparison. It is not a validated clinical pathology platform.");
+    return lines.join("\n");
+  }
+
+  async function copyReport() {
+    if (!state.lastReport) return;
+    try {
+      await navigator.clipboard.writeText(state.lastReport);
+      alert("Report copied:\n\n" + state.lastReport);
+    } catch (err) {
+      ids("hiddenReport").style.display = "block";
+      ids("hiddenReport").select();
+      document.execCommand("copy");
+      ids("hiddenReport").style.display = "none";
+      alert("Report copied. Clipboard fallback used.");
+    }
+  }
+
+  function exportReport() {
+    if (!state.lastReport) return;
+    const blob = new Blob([state.lastReport], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "DAB_4_image_dilution_series_report.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function resetAll() {
+    state.images = [null, null, null, null];
+    state.names = ["Image 1", "Image 2", "Image 3", "Image 4"];
+    state.roi = null;
+    state.drawing = false;
+    state.drawStart = null;
+    state.lastReport = "";
+    state.results = null;
+    fileInputs.forEach((f, i) => { f.value = ""; ids("name" + (i + 1)).textContent = "No image loaded"; });
+    canvases.forEach(c => { c.width = 1; c.height = 1; c.getContext("2d").clearRect(0, 0, 1, 1); });
+    ids("copyBtn").disabled = true;
+    ids("exportBtn").disabled = true;
+    ids("refMean").textContent = "--";
+    ids("largestOverall").textContent = "--";
+    ids("greatestBucketShort").textContent = "--";
+    ids("roiModeText").textContent = "--";
+    ids("recommendationBox").className = "recommendation";
+    ids("recommendationBox").textContent = "Lot acceptance recommendation: --";
+    ids("overallBody").innerHTML = "";
+    ids("bucketBody").innerHTML = "";
+    clearChart();
+    setStatus("Load four images, draw an ROI on Image 1, then press Calculate.");
+  }
+
+  function clearChart() {
+    const c = ids("barChart");
+    const ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width || 1, c.height || 1);
+  }
+
+  function dabOD(r, g, b) {
+    const rn = Math.max(r, 1) / 255;
+    const gn = Math.max(g, 1) / 255;
+    const bn = Math.max(b, 1) / 255;
+    const odR = -Math.log(rn);
+    const odG = -Math.log(gn);
+    const odB = -Math.log(bn);
+    const brownBias = Math.max(0, odB - (odR * 0.55));
+    return Math.max(0, (0.28 * odR) + (0.45 * odG) + (0.27 * odB) + (0.25 * brownBias));
+  }
+
+  function bucketStats(arr, total) {
+    return { n: arr.length, mean: arr.length ? mean(arr) : null, areaPct: total ? (arr.length / total) * 100 : 0 };
+  }
+
+  function zone(diff, p) {
+    if (diff === null || !isFinite(diff)) return "Not available";
+    if (diff < p.greenLimit) return "Green";
+    if (diff <= p.yellowLimit) return "Yellow";
+    return "Red";
+  }
+
+  function zoneClass(z) {
+    if (z === "Green") return "cell-green";
+    if (z === "Yellow") return "cell-yellow";
+    if (z === "Red") return "cell-red";
+    return "";
+  }
+
+  function recommendationFromMax(maxDiff, p) {
+    if (maxDiff < p.greenLimit) return "Accept";
+    if (maxDiff <= p.yellowLimit) return "Review";
+    return "Investigate";
+  }
+
+  function mean(arr) {
+    if (!arr || !arr.length) return null;
+    let s = 0;
+    for (const v of arr) s += v;
+    return s / arr.length;
+  }
+
+  function percentDifference(a, b) {
+    const avg = (Math.abs(a) + Math.abs(b)) / 2;
+    if (avg === 0) return 0;
+    return (Math.abs(b - a) / avg) * 100;
+  }
+
+  function percentDifferenceNullable(a, b) {
+    if (a === null || b === null || !isFinite(a) || !isFinite(b)) return null;
+    return percentDifference(a, b);
+  }
+
+  function direction(a, b) {
+    const eps = 1e-9;
+    if (Math.abs(b - a) < eps) return "similar";
+    return b > a ? "darker / stronger" : "lighter / weaker";
+  }
+
+  function directionNullable(a, b) {
+    if (a === null || b === null || !isFinite(a) || !isFinite(b)) return "not available";
+    return direction(a, b);
+  }
+
+  function blend(d, i, rr, gg, bb, alpha) {
+    d[i] = Math.round((1 - alpha) * d[i] + alpha * rr);
+    d[i + 1] = Math.round((1 - alpha) * d[i + 1] + alpha * gg);
+    d[i + 2] = Math.round((1 - alpha) * d[i + 2] + alpha * bb);
+  }
+
+  function fmt(x) {
+    if (x === null || !isFinite(x)) return "--";
+    return Number(x).toFixed(3);
+  }
+
+  function fmtNullable(x) { return fmt(x); }
+
+  function fmtPct(x) {
+    if (x === null || !isFinite(x)) return "--";
+    return Number(x).toFixed(1) + "%";
+  }
+
+  function fmtPctNullable(x) { return fmtPct(x); }
+
+  function signedPct(x) {
+    if (x === null || !isFinite(x)) return "--";
+    const sign = x > 0 ? "+" : "";
+    return sign + Number(x).toFixed(1) + "%";
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function max3(a, b, c) { return Math.max(a, Math.max(b, c)); }
+  function min3(a, b, c) { return Math.min(a, Math.min(b, c)); }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function setStatus(msg) { ids("statusBox").textContent = msg; }
+})();
+</script>
+</body>
+</html>
