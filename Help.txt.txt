@@ -1,0 +1,543 @@
+HELP.TXT
+DAB 4-IMAGE DILUTION SERIES LINEARITY COMPARATOR
+=================================================
+
+PURPOSE
+-------
+
+The DAB 4-Image Dilution Series Linearity Comparator is a browser-based
+research tool for comparing relative DAB staining intensity across four
+serially sectioned, ROI-matched immunohistochemistry images from an antibody
+dilution series.
+
+The purpose is to provide a practical, repeatable way to determine whether
+DAB staining changes in an expected and reasonably proportional manner across
+a dilution range. In a well-behaved dilution series, the average DAB optical
+density should generally change in the expected direction as antibody
+concentration increases or decreases. This tool helps document those changes
+using the same region of interest, the same manual intensity thresholds, and
+the same percent-difference logic across all four images.
+
+This tool is intended for research, assay development, staining optimization,
+lot comparison support, and quality review. It is not a validated clinical
+diagnostic image analysis system.
+
+WHAT THE TOOL COMPARES
+----------------------
+
+The comparator evaluates four DAB-stained images:
+
+1. Image 1 / Reference
+2. Image 2
+3. Image 3
+4. Image 4
+
+Image 1 is treated as the reference image. Images 2, 3, and 4 are compared
+against Image 1.
+
+The tool calculates:
+
+- Mean DAB optical density for each image
+- Percent difference in mean DAB optical density versus Image 1
+- Direction of change versus Image 1:
+  - darker / stronger
+  - lighter / weaker
+  - similar
+- Weak, moderate, and strong staining bucket summaries
+- Mean optical density within each staining bucket
+- Area percentage represented by each bucket
+- Area delta versus Image 1
+- Control zone assignment:
+  - Green
+  - Yellow
+  - Red
+- Lot or dilution-series acceptance recommendation:
+  - Accept
+  - Review
+  - Investigate
+- A bar chart comparing average DAB intensity across the four images
+- A copyable/exportable text report
+
+WHY USE A DILUTION SERIES?
+--------------------------
+
+A dilution series is useful when optimizing or qualifying an IHC stain because
+it shows how staining intensity changes as antibody concentration changes.
+For DAB-based stains, this can help identify whether the stain is too weak,
+too strong, saturated, or operating in a useful analytical range.
+
+A dilution series is especially helpful for:
+
+- Selecting a working antibody dilution
+- Demonstrating that staining response changes in the expected direction
+- Comparing new and existing reagent lots
+- Evaluating staining robustness
+- Identifying overstaining or saturation
+- Supporting assay optimization records
+- Documenting relative intensity changes in a research setting
+
+The goal is not merely to find the darkest stain. The goal is to identify a
+dilution that produces interpretable, reproducible staining with useful
+dynamic range and acceptable background.
+
+GENERAL WORKFLOW
+----------------
+
+1. Prepare a four-point dilution series for the IHC marker of interest.
+2. Use serial tissue sections when possible.
+3. Stain all slides under controlled and documented conditions.
+4. Capture images using consistent microscope or scanner settings.
+5. Select a comparable region of interest across the dilution series.
+6. Load the four images into the comparator in dilution order.
+7. Draw the ROI on Image 1.
+8. Review and adjust the DAB optical density thresholds if needed.
+9. Press Calculate.
+10. Review the structured tables, overlays, bar chart, and recommendation.
+11. Copy or export the report for documentation.
+
+IMAGE CAPTURE RECOMMENDATIONS
+-----------------------------
+
+For best results, images should be captured under comparable conditions.
+
+Recommended practice:
+
+- Use the same microscope, scanner, camera, or imaging platform.
+- Use the same magnification for all four images.
+- Use the same exposure, white balance, illumination, and image settings.
+- Avoid compressed or heavily altered images when possible.
+- Capture the same tissue compartment and approximately the same tissue area.
+- Avoid tissue folds, tears, necrosis, edge artifact, bubbles, and poor focus.
+- Use similar tissue thickness and staining runs when possible.
+- Avoid comparing images from substantially different acquisition conditions.
+
+The tool can compare images even when acquisition is imperfect, but the result
+is only as reliable as the image standardization and ROI selection.
+
+DETAILED INSTRUCTIONS FOR USE
+-----------------------------
+
+1. Load the images
+
+   Drag and drop or choose four image files:
+
+   - Image 1 / Reference
+   - Image 2
+   - Image 3
+   - Image 4
+
+   The images should represent the four points of the dilution series. Image 1
+   is the reference image used for comparison.
+
+2. Confirm the image order
+
+   Load the images in a meaningful order, such as:
+
+   - Highest concentration to lowest concentration
+
+   or
+
+   - Lowest dilution to highest dilution
+
+   Use the same ordering convention consistently in your records. The tool
+   does not know the actual dilution factor unless you document it externally
+   or in the exported report filename.
+
+3. Draw the ROI on Image 1
+
+   ROI Drawing is ON by default.
+
+   Use the mouse to draw a rectangle on Image 1. The same relative ROI is then
+   applied to Images 2, 3, and 4.
+
+   The ROI should represent a comparable tissue area across the serial
+   sections. Ideally, choose an area with:
+
+   - Similar tissue composition
+   - Similar tumor or target cell density
+   - Similar staining distribution
+   - Minimal artifact
+   - Minimal background or empty glass
+   - Adequate number of analyzable tissue pixels
+
+4. Use whole-image analysis only when appropriate
+
+   If no ROI is drawn, the tool analyzes the whole image.
+
+   Whole-image analysis is allowed, but it is usually less defensible because
+   differences in tissue area, blank background, folds, and non-comparable
+   regions may influence the result.
+
+   For most IHC dilution-series comparisons, ROI-based analysis is preferred.
+
+5. Adjust manual DAB optical density thresholds
+
+   The tool uses manual optical density cutoffs to classify DAB staining into
+   visible intensity buckets.
+
+   Default thresholds:
+
+   - Negative/Weak OD cutoff: 0.120
+   - Weak/Moderate OD cutoff: 0.260
+   - Moderate/Strong OD cutoff: 0.450
+
+   These thresholds separate:
+
+   - Negative/background signal
+   - Weak DAB staining
+   - Moderate DAB staining
+   - Strong DAB staining
+
+   Negative/background staining is excluded from the visible weak/moderate/
+   strong bucket comparison.
+
+   Adjust these thresholds only when there is a documented reason to do so.
+   The same thresholds are applied to all four images, which is essential for
+   fair comparison.
+
+6. Set control limits
+
+   Default control limits:
+
+   - Green limit: less than 15% difference
+   - Yellow upper limit: 25% difference or less
+   - Red zone: greater than 25% difference
+
+   These limits are used to classify differences and generate the final
+   recommendation.
+
+   Default interpretation:
+
+   - Green: difference is below the green limit
+   - Yellow: difference is between the green limit and yellow upper limit
+   - Red: difference is above the yellow upper limit
+
+   These limits are practical review limits and should be adjusted only if
+   your laboratory has a defined acceptance criterion for the intended use.
+
+7. Set minimum ROI pixels
+
+   Default minimum ROI pixels: 500
+
+   This is the minimum number of analyzable tissue pixels required in the ROI.
+   If an image has too few analyzable pixels, the tool will ask you to adjust
+   the ROI or minimum pixel setting.
+
+   Do not set the minimum pixel count too low unless the tissue is genuinely
+   limited. Very small ROIs are more vulnerable to sampling error.
+
+8. Press Calculate
+
+   After all four images are loaded and the ROI/thresholds are set, press
+   Calculate.
+
+   The tool will calculate the DAB optical density summaries, apply the
+   matched ROI, generate overlays, populate the result tables, draw the bar
+   chart, and generate the recommendation.
+
+9. Review the status message
+
+   The status field will report whether analysis was completed or whether a
+   correction is needed, such as missing images, invalid thresholds, or too few
+   analyzable pixels.
+
+10. Review the result metrics
+
+   The top result panel provides:
+
+   - Reference Mean DAB OD
+   - Largest Overall % Difference
+   - Greatest Bucket Difference
+   - ROI Mode
+
+   These fields provide a rapid summary of how much variation was detected
+   and whether the analysis used an ROI or the whole image.
+
+11. Review the acceptance recommendation
+
+   The recommendation is based on the maximum relevant difference detected
+   across the overall and bucket comparisons.
+
+   Recommendation logic:
+
+   - Accept: maximum relevant difference is below the green limit
+   - Review: maximum relevant difference is within the yellow zone
+   - Investigate: maximum relevant difference is above the yellow limit
+
+   The recommendation should not be used blindly. Review the images, ROI,
+   overlays, and tables before accepting the conclusion.
+
+12. Review the average DAB intensity bar chart
+
+   The bar chart displays the mean DAB optical density for Images 1 through 4.
+
+   This is useful for visually assessing whether staining intensity changes in
+   a plausible dilution-series pattern.
+
+   In a dilution series, the expected pattern depends on image order:
+
+   - If Image 1 is the strongest concentration and Image 4 is the weakest,
+     the bars should generally decrease.
+   - If Image 1 is the weakest concentration and Image 4 is the strongest,
+     the bars should generally increase.
+
+   A non-monotonic or erratic pattern should prompt review of ROI placement,
+   image acquisition, tissue comparability, staining quality, and possible
+   technical issues.
+
+13. Review the Overall DAB OD Summary table
+
+   This table shows:
+
+   - Image number
+   - Mean DAB OD
+   - Percent difference versus Image 1
+   - Direction versus Image 1
+   - Control zone
+   - ROI tissue pixels
+
+   This table is the main summary of overall DAB intensity.
+
+14. Review the Weak / Moderate / Strong Buckets table
+
+   This table shows bucket-specific results for weak, moderate, and strong
+   staining.
+
+   For each image and bucket, it reports:
+
+   - Mean OD
+   - Percent difference versus the same Image 1 bucket
+   - Area percentage
+   - Area delta versus Image 1
+   - Direction
+   - Control zone
+
+   This helps determine whether changes are occurring mainly in weak,
+   moderate, or strong staining compartments.
+
+15. Review the QC overlays
+
+   The tool displays colored overlays in the ROI to help visualize how pixels
+   were assigned to staining categories.
+
+   Overlay concept:
+
+   - Weak staining: blue overlay
+   - Moderate staining: orange overlay
+   - Strong staining: red overlay
+
+   Review overlays to confirm that the tool is identifying the expected DAB
+   signal and not overcalling artifact, background, or non-target tissue.
+
+16. Copy the report
+
+   Press Copy Report to copy the generated text report to the clipboard.
+
+   The report includes:
+
+   - Generation date/time
+   - ROI mode
+   - Recommendation
+   - Maximum relevant difference
+   - Image names
+   - Manual thresholds
+   - Overall DAB OD summary
+   - Weak/moderate/strong bucket summary
+   - Greatest bucket difference
+   - Formulas
+   - Important notes and cautions
+
+17. Export the report
+
+   Press Export Report to save the report as a text file.
+
+   The default export filename is:
+
+   DAB_4_image_dilution_series_report.txt
+
+18. Reset if needed
+
+   Press Reset to clear loaded images, ROI, results, tables, chart, and report.
+
+IMPORTANT FORMULAS
+------------------
+
+Overall percent difference:
+
+   |Image N Mean DAB OD - Image 1 Mean DAB OD|
+   ------------------------------------------------ x 100
+      average of Image N Mean DAB OD and Image 1 Mean DAB OD
+
+Bucket percent difference uses the same formula, but compares the mean DAB
+optical density within the same bucket only.
+
+Area delta:
+
+   Image N bucket tissue fraction - Image 1 bucket tissue fraction
+
+Direction is reported separately as:
+
+- darker / stronger
+- lighter / weaker
+- similar
+
+WHY THE TOOL USES PERCENT DIFFERENCE THIS WAY
+---------------------------------------------
+
+The tool uses a symmetric percent difference formula based on the average of
+the two values being compared. This avoids treating Image 1 as the only
+denominator and gives a balanced estimate of the magnitude of difference
+between two measurements.
+
+For example, a change from 0.20 to 0.30 and a change from 0.30 to 0.20 have
+the same percent difference, while the direction field separately states
+whether the image is darker/stronger or lighter/weaker.
+
+INTERPRETING RESULTS
+--------------------
+
+Accept
+
+An Accept recommendation means the maximum relevant difference is below the
+green limit. This suggests that the compared images are within the selected
+control limit. Review the ROI and overlays before final documentation.
+
+Review
+
+A Review recommendation means at least one relevant difference is within the
+yellow zone. This does not automatically mean failure. It means the finding
+should be reviewed in context.
+
+Possible causes include:
+
+- Expected change across dilution points
+- Slight ROI mismatch
+- Tissue heterogeneity
+- Image acquisition variation
+- Borderline threshold setting
+- Real staining difference
+
+Investigate
+
+An Investigate recommendation means at least one relevant difference exceeds
+the yellow upper limit. This should prompt further review before accepting the
+series.
+
+Possible causes include:
+
+- Nonlinear staining response
+- Overdilution
+- Saturation at high antibody concentration
+- Reagent lot issue
+- Instrument or staining run variation
+- Tissue section mismatch
+- Poor ROI placement
+- Focus, exposure, or white balance differences
+- Tissue artifact or background staining
+
+LINEARITY INTERPRETATION
+------------------------
+
+This tool does not mathematically fit a formal regression line to known
+dilution concentrations. Instead, it supports practical linearity review by
+showing whether average DAB intensity and bucket distributions change
+consistently across a four-image dilution series.
+
+For a more formal linearity study, record the actual dilution factors and
+compare the measured mean DAB OD values against the expected dilution order.
+A separate regression or trend analysis may be used if quantitative dilution
+factors are available.
+
+Practical indicators of a reasonable dilution-series response include:
+
+- Mean DAB OD changes in the expected direction.
+- The bar chart shows an orderly increase or decrease.
+- Strong staining area decreases as dilution increases, if Image 1 is the
+  strongest concentration.
+- Weak staining may increase as strong staining decreases, depending on the
+  marker and tissue.
+- The ROI overlays remain biologically plausible.
+- Background does not dominate the analysis.
+- No single image behaves as an unexplained outlier.
+
+Practical warning signs include:
+
+- Image 3 is stronger than Image 2 and Image 4 without a biological or
+  technical explanation.
+- The highest concentration image appears saturated.
+- The lowest concentration image has no meaningful signal.
+- Strong staining remains unchanged across large dilution changes.
+- Background staining increases as specific staining decreases.
+- The ROI is not comparable across images.
+- The bucket table shows large unexplained shifts.
+
+RECOMMENDED DOCUMENTATION
+-------------------------
+
+For each dilution-series comparison, document:
+
+- Marker name
+- Antibody clone
+- Antibody vendor
+- Antibody lot
+- Detection system
+- Tissue type
+- Control tissue or test tissue
+- Dilution series used
+- Staining platform
+- Image acquisition platform
+- Magnification or scanner setting
+- Date of staining
+- Date of image analysis
+- Operator/reviewer
+- ROI rationale
+- Threshold settings
+- Control limits
+- Final recommendation
+- Any corrective action or follow-up
+
+LIMITATIONS
+-----------
+
+This comparator has important limitations.
+
+- It is a practical browser tool, not a validated clinical diagnostic system.
+- It estimates relative DAB optical density from RGB image data.
+- It does not perform full stain deconvolution validated against a reference
+  clinical image analysis system.
+- It does not know the actual antibody dilution unless documented externally.
+- It does not replace pathologist review.
+- It is sensitive to image acquisition settings.
+- It is sensitive to ROI selection.
+- It may be affected by counterstain intensity, tissue thickness, folds,
+  necrosis, melanin, pigment, scanner settings, and background staining.
+- It should not be used as the sole basis for clinical interpretation.
+
+BEST PRACTICE SUMMARY
+---------------------
+
+For the most defensible use:
+
+- Use serial sections.
+- Use standardized staining and imaging conditions.
+- Load images in the correct dilution order.
+- Draw a representative ROI on Image 1.
+- Confirm that the matched ROI is appropriate on Images 2-4.
+- Use documented thresholds.
+- Review overlays before accepting numeric results.
+- Interpret results in the context of known dilution factors.
+- Export the report and retain it with the assay optimization or QC record.
+- Do not overinterpret small differences when tissue or image conditions are
+  not well controlled.
+
+SHORT VERSION
+-------------
+
+Load four DAB IHC dilution-series images, draw a representative ROI on Image 1,
+adjust thresholds if needed, press Calculate, then review the mean DAB OD,
+percent differences, staining bucket summaries, overlays, bar chart, and final
+Accept / Review / Investigate recommendation.
+
+The tool is best used as a practical, research-oriented way to document whether
+DAB staining intensity changes in an orderly and interpretable manner across an
+IHC dilution series.
